@@ -1,6 +1,6 @@
 package com.example.spring_test.Config.Securtiy;
 
-import com.example.spring_test.models.User;
+import com.example.spring_test.models.Employee;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,28 +9,28 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails {
-    private User user;
+    private Employee employee;
 
-    public CustomUserDetails(User user) {
-        this.user = user;
+    public CustomUserDetails(Employee employee) {
+        this.employee = employee;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getRoles()
-                .stream()
-                .map(roles -> new SimpleGrantedAuthority(roles.getRoleCode())
-                ).toList();
+        return employee.getRoles().stream()
+//                .filter(Access_level::isActive)
+                .map(l -> new SimpleGrantedAuthority(l))
+                .toList();
     }
 
     @Override
     public @Nullable String getPassword() {
-        return user.getPassword();
+        return employee.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return employee.getEmail();
     }
 
     @Override

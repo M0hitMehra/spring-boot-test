@@ -69,9 +69,11 @@ public class AuthControler {
                                 request.password()
                         )
                 );
-
+        System.out.println("AuthenticationAuthentication" + authentication);
         CustomUserDetails userDetails =
                 (CustomUserDetails) authentication.getPrincipal();
+
+        System.out.println("userDetailsuserDetails" + userDetails);
 
         String token =
                 jwtService.generateToken(userDetails);

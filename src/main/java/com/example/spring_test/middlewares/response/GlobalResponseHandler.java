@@ -5,13 +5,13 @@ import org.springframework.http.ResponseEntity;
 
 public class GlobalResponseHandler {
 
-    public static <T> ResponseEntity<ApiResponse<T>> success(
+    public static <Object> ResponseEntity<ApiResponse<Object>> success(
             String message,
-            T data,
+            java.lang.Object data,
             HttpStatus httpStatus
     ) {
 
-        ApiResponse<T> response =
+        ApiResponse<Object> response =
                 new ApiResponse<>(true, message, data);
 
         return ResponseEntity

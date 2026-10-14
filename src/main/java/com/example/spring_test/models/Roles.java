@@ -1,15 +1,22 @@
 package com.example.spring_test.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Entity
 @Table(name = "roles")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Roles {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String description;
 
     @Column(name = "roleName", nullable = false)
     private String roleName;
@@ -19,5 +26,4 @@ public class Roles {
 
     @Column(name = "isActive")
     private boolean isActive = true;
-
 }

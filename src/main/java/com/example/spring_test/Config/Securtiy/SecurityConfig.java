@@ -60,7 +60,8 @@ public class SecurityConfig {
                                         "/swagger-ui/**",      // Swagger UI pages
                                         "/swagger-ui.html",    // Swagger UI redirect
                                         "/v3/api-docs/**",     // OpenAPI JSON docs
-                                        "/webjars/**")
+                                        "/webjars/**",
+                                        "/api/v1/**")
                                 .permitAll()
                                 .requestMatchers("/admin/**")
                                 .hasRole("ADMIN")

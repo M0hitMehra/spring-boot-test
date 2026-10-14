@@ -37,6 +37,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // Skip JWT processing for public endpoints
         if (path.startsWith("/swagger-ui")
+                || path.startsWith("/api/v1")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/swagger-ui.html")
                 || path.startsWith("/webjars")

@@ -9,7 +9,6 @@ import java.util.List;
 public final class UserDTO {
 
     private UserDTO() {
-        // Utility wrapper class
     }
 
     public record SignupRequest(
@@ -18,6 +17,24 @@ public final class UserDTO {
 
             @NotBlank(message = "password required")
             String password,
+
+            @NotBlank(message = "firstName required")
+            String firstName,
+
+            @NotBlank(message = "lastName required")
+            String lastName,
+
+            @NotBlank(message = "middleName required")
+            String middleName,
+
+            @NotBlank(message = "team id required")
+            String team_id,
+
+            @NotBlank(message = "designation id required")
+            String designation_id,
+
+            @NotBlank(message = "manager id required")
+            String manager_id,
 
             @NotBlank(message = "email required")
             @Email(message = "invalid email")
@@ -38,6 +55,7 @@ public final class UserDTO {
 
             @NotEmpty(message = "Roles cannot be empty")
             List<String> roles
+
     ) {
     }
 
