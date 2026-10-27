@@ -1,5 +1,6 @@
 package com.example.spring_test.services;
 
+import com.example.spring_test.middlewares.error.ApiException;
 import com.example.spring_test.middlewares.response.ApiResponse;
 import com.example.spring_test.middlewares.response.GlobalResponseHandler;
 import com.example.spring_test.models.Address;
@@ -25,7 +26,7 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
 
-    CompanyService(CompanyRepository companyRepository) {   // package-private constructor
+    CompanyService(CompanyRepository companyRepository) {
         this.companyRepository = companyRepository;
     }
 
@@ -68,14 +69,43 @@ public class CompanyService {
     public ResponseEntity<ApiResponse<Object>> getCompanies(CompanyDTO.CompanySearchRequest filter, Pageable pageable) {
 
         Specification<Company> specification = CompanySpecifications.fromFilter(filter);
-        System.out.println("------------------");
-        System.out.println(filter.gstin());
-        System.out.println(specification);
         Page<Company> companies = companyRepository.findAll(specification, pageable);
 
         return GlobalResponseHandler.success(
                 "Companies fetched successfully",
                 companies,
                 HttpStatus.OK);
+    }
+
+    public ResponseEntity<ApiResponse<Object>> getCompanyByCode(String companyCode) {
+        Company company = companyRepository.findByCode(companyCode).stream().findFirst()
+                .orElseThrow(() -> new ApiException("NOT_FOUND", "Company not found with code: " + companyCode, HttpStatus.NOT_FOUND));
+
+        return GlobalResponseHandler.success("Company fetched successfully", company, HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<ApiResponse<Object>> updateCompany(String companyCode, CompanyDTO.UpdateCompanyRequestBody body) {
+        Company company = companyRepository.findByCode(companyCode).stream().findFirst()
+                .orElseThrow(() -> new ApiException("NOT_FOUND", "Company not found with code: " + companyCode, HttpStatus.NOT_FOUND));
+
+        if (body.name() != null) company.setName(body.name());
+        if (body.legalName() != null) company.setLegalName(body.legalName());
+        if (body.email() != null) company.setEmail(body.email());
+        if (body.phone() != null) company.setPhone(body.phone());
+        if (body.gstin() != null) company.setGstin(body.gstin());
+        if (body.status() != null) company.setStatus(body.status());
+
+        Company savedCompany = companyRepository.save(company);
+        return GlobalResponseHandler.success("Company updated successfully", savedCompany, HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<ApiResponse<Object>> deleteCompany(String companyCode) {
+        Company company = companyRepository.findByCode(companyCode).stream().findFirst()
+                .orElseThrow(() -> new ApiException("NOT_FOUND", "Company not found with code: " + companyCode, HttpStatus.NOT_FOUND));
+
+        companyRepository.delete(company);
+        return GlobalResponseHandler.success("Company deleted successfully", null, HttpStatus.OK);
     }
 }

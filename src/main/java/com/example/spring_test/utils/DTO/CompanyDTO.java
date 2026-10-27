@@ -129,4 +129,14 @@ public final class CompanyDTO {
 
     ) {
     }
+
+    public record UpdateCompanyRequestBody(
+            String name,
+            String legalName,
+            String email,
+            String phone,
+            String gstin,
+            Company.Status status
+    ) {
+    }
 }
