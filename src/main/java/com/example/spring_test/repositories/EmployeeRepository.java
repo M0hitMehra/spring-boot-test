@@ -13,4 +13,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 
     @EntityGraph(attributePaths = "roles")
     Optional<Employee> findByEmail(String username);
+
+    Optional<Employee> findByEmployeeCode(String s);
 }

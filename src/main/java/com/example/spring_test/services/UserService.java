@@ -5,8 +5,7 @@ import com.example.spring_test.middlewares.response.ApiResponse;
 import com.example.spring_test.middlewares.response.GlobalResponseHandler;
 import com.example.spring_test.models.Access_level;
 import com.example.spring_test.models.Employee;
-import com.example.spring_test.repositories.AccessLevelRepository;
-import com.example.spring_test.repositories.EmployeeRepository;
+import com.example.spring_test.repositories.*;
 import com.example.spring_test.utils.DTO.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +23,18 @@ public class UserService {
 
     @Autowired
     private AccessLevelRepository accessLevelRepository;
+
+    @Autowired
+    private BranchRepository branchRepository;
+
+    @Autowired
+    private TeamRepository teamRepository;
+
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private DesignationRepository designationRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -48,6 +59,29 @@ public class UserService {
         new_user.setFirstName(user.firstName());
         new_user.setFirstName(user.middleName());
         new_user.setFirstName(user.lastName());
+        if (teamRepository.findByCode(user.team_id()).isEmpty()) {
+            throw new ApiException(
+                    "TEAM_ID_MISSING",
+                    "Team id is required",
+                    HttpStatus.UNPROCESSABLE_CONTENT
+            );
+        }
+
+        if (designationRepository.findByName(user.designation_id()).isEmpty()) {
+            throw new ApiException(
+                    "DESIGNATION_MISSING",
+                    "Designation is required",
+                    HttpStatus.UNPROCESSABLE_CONTENT
+            );
+        }
+
+        if (employeeRepository.findByEmployeeCode(user.manager_id()).isEmpty()) {
+            throw new ApiException(
+                    "MANAGER_MISSING",
+                    "Manager code is required",
+                    HttpStatus.UNPROCESSABLE_CONTENT
+            );
+        }
         new_user.setTeam_id(user.team_id());
         new_user.setDesignation_id(user.designation_id());
         new_user.setManager_id(user.manager_id());
