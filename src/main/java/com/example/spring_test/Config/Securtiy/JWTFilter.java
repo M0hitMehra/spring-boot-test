@@ -35,6 +35,11 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Skip JWT processing for public endpoints
         if (path.startsWith("/swagger-ui")
 //                || path.startsWith("/api/v1")
