@@ -8,9 +8,6 @@ public final class AccessLevelDTO {
     }
 
     public record CreateAccessLevelRequest(
-            @NotBlank(message = "Access level code is required")
-            String accessLevelCode,
-
             @NotBlank(message = "Access level name is required")
             String accessLevel,
 

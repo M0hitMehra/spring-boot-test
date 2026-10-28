@@ -8,6 +8,7 @@ import com.example.spring_test.models.Department;
 import com.example.spring_test.repositories.BranchRepository;
 import com.example.spring_test.repositories.DepartmentRepository;
 import com.example.spring_test.utils.DTO.DepartmentDTO;
+import com.example.spring_test.utils.helpers.GlobalHelpers;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,15 +26,16 @@ public class DepartmentService {
 
     @Transactional
     public ResponseEntity<ApiResponse<Object>> createDepartment(DepartmentDTO.CreateDepartmentRequest body) {
-        if (departmentRepository.findByCode(body.code()).isPresent()) {
-            throw new ApiException("ALREADY_EXISTS", "Department already exists with code: " + body.code(), HttpStatus.CONFLICT);
+        Branch branch = branchRepository.findByCode(body.branchCode())
+                .orElseThrow(() -> new ApiException("BRANCH_NOT_FOUND", "Branch not found with code: " + body.branchCode(), HttpStatus.UNPROCESSABLE_CONTENT));
+
+        String departmentCode = GlobalHelpers.generateCode(body.name(), 4);
+        while (departmentRepository.findByCode(departmentCode).isPresent()) {
+            departmentCode = GlobalHelpers.generateCode(body.name(), 4);
         }
 
-        Branch branch = branchRepository.findByCode(body.branchCode())
-                .orElseThrow(() -> new ApiException("NOT_FOUND", "Branch not found with code: " + body.branchCode(), HttpStatus.NOT_FOUND));
-
         Department department = Department.builder()
-                .code(body.code())
+                .code(departmentCode)
                 .name(body.name())
                 .branch(branch)
                 .description(body.description())
@@ -67,7 +69,7 @@ public class DepartmentService {
 
         if (body.branchCode() != null && !body.branchCode().isBlank()) {
             Branch branch = branchRepository.findByCode(body.branchCode())
-                    .orElseThrow(() -> new ApiException("NOT_FOUND", "Branch not found with code: " + body.branchCode(), HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new ApiException("BRANCH_NOT_FOUND", "Branch not found with code: " + body.branchCode(), HttpStatus.UNPROCESSABLE_CONTENT));
             department.setBranch(branch);
         }
 

@@ -8,9 +8,6 @@ public final class RoleDTO {
     }
 
     public record CreateRoleRequest(
-            @NotBlank(message = "Role code is required")
-            String roleCode,
-
             @NotBlank(message = "Role name is required")
             String roleName,
 

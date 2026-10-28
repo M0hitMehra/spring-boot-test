@@ -9,17 +9,16 @@ public final class TeamDTO {
     }
 
     public record CreateTeamRequest(
-            @NotBlank(message = "Team code is required")
-            String code,
-
             @NotBlank(message = "Team name is required")
             String name,
 
             @NotBlank(message = "Department code is required")
             String departmentCode,
 
-            String description,
+            @NotBlank(message = "Lead employee code is required")
             String leadCode,
+
+            String description,
             Team.Status status
     ) {
     }
@@ -27,8 +26,8 @@ public final class TeamDTO {
     public record UpdateTeamRequest(
             String name,
             String departmentCode,
-            String description,
             String leadCode,
+            String description,
             Team.Status status
     ) {
     }

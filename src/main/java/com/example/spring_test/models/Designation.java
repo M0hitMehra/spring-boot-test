@@ -20,6 +20,9 @@ public class Designation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "code", unique = true, length = 50)
+    private String code;
+
     @Column(nullable = false, unique = true, length = 150)
     private String name;
 
@@ -30,6 +33,7 @@ public class Designation {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
+    @Builder.Default
     private Status status = Status.ACTIVE;
 
     @CreationTimestamp

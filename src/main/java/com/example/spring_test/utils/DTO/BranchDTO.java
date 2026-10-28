@@ -9,18 +9,17 @@ public final class BranchDTO {
     }
 
     public record CreateBranchRequest(
-            @NotBlank(message = "Branch code is required")
-            String code,
-
             @NotBlank(message = "Branch name is required")
             String name,
 
             @NotBlank(message = "Company code is required")
             String companyCode,
 
+            @NotBlank(message = "Manager employee code is required")
+            String managerCode,
+
             String email,
             String phone,
-            String managerCode,
             Branch.Status status
     ) {
     }

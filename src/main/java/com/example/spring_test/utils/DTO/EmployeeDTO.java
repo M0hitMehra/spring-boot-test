@@ -12,9 +12,6 @@ public final class EmployeeDTO {
     }
 
     public record CreateEmployeeRequest(
-            @NotBlank(message = "Employee code is required")
-            String employeeCode,
-
             @NotBlank(message = "First name is required")
             String firstName,
 
@@ -27,10 +24,16 @@ public final class EmployeeDTO {
             @Email(message = "Invalid email format")
             String email,
 
-            String phone,
+            @NotBlank(message = "Team code is required")
             String teamCode,
+
+            @NotBlank(message = "Designation is required")
             String designation,
+
+            @NotBlank(message = "Manager employee code is required")
             String managerCode,
+
+            String phone,
             String password,
             Employee.EmploymentStatus status,
             List<String> roles

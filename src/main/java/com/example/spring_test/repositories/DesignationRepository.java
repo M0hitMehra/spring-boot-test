@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface DesignationRepository extends JpaRepository<Designation, Long> {
     Optional<Designation> findByName(String s);
+    Optional<Designation> findByCode(String code);
+    void deleteByCode(String code);
 }

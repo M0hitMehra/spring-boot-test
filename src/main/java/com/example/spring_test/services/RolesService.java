@@ -6,6 +6,7 @@ import com.example.spring_test.middlewares.response.GlobalResponseHandler;
 import com.example.spring_test.models.Roles;
 import com.example.spring_test.repositories.RolesRepository;
 import com.example.spring_test.utils.DTO.RoleDTO;
+import com.example.spring_test.utils.helpers.GlobalHelpers;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,12 +23,13 @@ public class RolesService {
 
     @Transactional
     public ResponseEntity<ApiResponse<Object>> createRole(RoleDTO.CreateRoleRequest body) {
-        if (rolesRepository.findByRoleCode(body.roleCode()) != null) {
-            throw new ApiException("ALREADY_EXISTS", "Role already exists with code: " + body.roleCode(), HttpStatus.CONFLICT);
+        String roleCode = "ROLE_" + GlobalHelpers.generateCode(body.roleName(), 4);
+        while (rolesRepository.findByRoleCode(roleCode) != null) {
+            roleCode = "ROLE_" + GlobalHelpers.generateCode(body.roleName(), 4);
         }
 
         Roles role = Roles.builder()
-                .roleCode(body.roleCode())
+                .roleCode(roleCode)
                 .roleName(body.roleName())
                 .description(body.description())
                 .isActive(body.isActive() != null ? body.isActive() : true)

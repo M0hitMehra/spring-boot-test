@@ -8,6 +8,7 @@ import com.example.spring_test.repositories.BranchRepository;
 import com.example.spring_test.repositories.CompanyRepository;
 import com.example.spring_test.repositories.EmployeeRepository;
 import com.example.spring_test.utils.DTO.BranchDTO;
+import com.example.spring_test.utils.helpers.GlobalHelpers;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,16 +27,15 @@ public class BranchService {
 
     @Transactional
     public ResponseEntity<ApiResponse<Object>> createBranch(BranchDTO.CreateBranchRequest body) {
-        if (branchRepository.findByCode(body.code()).isPresent()) {
-            throw new ApiException("ALREADY_EXISTS", "Branch already exists with code: " + body.code(), HttpStatus.CONFLICT);
-        }
-
         Company company = companyRepository.findByCode(body.companyCode()).stream().findFirst()
-                .orElseThrow(() -> new ApiException("NOT_FOUND", "Company not found with code: " + body.companyCode(), HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ApiException("COMPANY_NOT_FOUND", "Company not found with code: " + body.companyCode(), HttpStatus.UNPROCESSABLE_CONTENT));
 
-        Employee manager = null;
-        if (body.managerCode() != null && !body.managerCode().isBlank()) {
-            manager = employeeRepository.findByEmployeeCode(body.managerCode()).orElse(null);
+        Employee manager = employeeRepository.findByEmployeeCode(body.managerCode())
+                .orElseThrow(() -> new ApiException("MANAGER_NOT_FOUND", "Manager not found with employee code: " + body.managerCode(), HttpStatus.UNPROCESSABLE_CONTENT));
+
+        String branchCode = GlobalHelpers.generateCode(body.name(), 4);
+        while (branchRepository.findByCode(branchCode).isPresent()) {
+            branchCode = GlobalHelpers.generateCode(body.name(), 4);
         }
 
         Address regAddress = Address.builder()
@@ -55,7 +55,7 @@ public class BranchService {
                 .build();
 
         Branch branch = Branch.builder()
-                .code(body.code())
+                .code(branchCode)
                 .name(body.name())
                 .company(company)
                 .manager(manager)
@@ -94,13 +94,13 @@ public class BranchService {
 
         if (body.companyCode() != null && !body.companyCode().isBlank()) {
             Company company = companyRepository.findByCode(body.companyCode()).stream().findFirst()
-                    .orElseThrow(() -> new ApiException("NOT_FOUND", "Company not found with code: " + body.companyCode(), HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new ApiException("COMPANY_NOT_FOUND", "Company not found with code: " + body.companyCode(), HttpStatus.UNPROCESSABLE_CONTENT));
             branch.setCompany(company);
         }
 
         if (body.managerCode() != null && !body.managerCode().isBlank()) {
             Employee manager = employeeRepository.findByEmployeeCode(body.managerCode())
-                    .orElseThrow(() -> new ApiException("NOT_FOUND", "Manager not found with employee code: " + body.managerCode(), HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new ApiException("MANAGER_NOT_FOUND", "Manager not found with employee code: " + body.managerCode(), HttpStatus.UNPROCESSABLE_CONTENT));
             branch.setManager(manager);
         }
 

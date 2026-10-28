@@ -10,6 +10,7 @@ import com.example.spring_test.repositories.DepartmentRepository;
 import com.example.spring_test.repositories.EmployeeRepository;
 import com.example.spring_test.repositories.TeamRepository;
 import com.example.spring_test.utils.DTO.TeamDTO;
+import com.example.spring_test.utils.helpers.GlobalHelpers;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,20 +29,19 @@ public class TeamService {
 
     @Transactional
     public ResponseEntity<ApiResponse<Object>> createTeam(TeamDTO.CreateTeamRequest body) {
-        if (teamRepository.findByCode(body.code()).isPresent()) {
-            throw new ApiException("ALREADY_EXISTS", "Team already exists with code: " + body.code(), HttpStatus.CONFLICT);
-        }
-
         Department department = departmentRepository.findByCode(body.departmentCode())
-                .orElseThrow(() -> new ApiException("NOT_FOUND", "Department not found with code: " + body.departmentCode(), HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ApiException("DEPARTMENT_NOT_FOUND", "Department not found with code: " + body.departmentCode(), HttpStatus.UNPROCESSABLE_CONTENT));
 
-        Employee lead = null;
-        if (body.leadCode() != null && !body.leadCode().isBlank()) {
-            lead = employeeRepository.findByEmployeeCode(body.leadCode()).orElse(null);
+        Employee lead = employeeRepository.findByEmployeeCode(body.leadCode())
+                .orElseThrow(() -> new ApiException("LEAD_NOT_FOUND", "Lead employee not found with code: " + body.leadCode(), HttpStatus.UNPROCESSABLE_CONTENT));
+
+        String teamCode = GlobalHelpers.generateCode(body.name(), 4);
+        while (teamRepository.findByCode(teamCode).isPresent()) {
+            teamCode = GlobalHelpers.generateCode(body.name(), 4);
         }
 
         Team team = Team.builder()
-                .code(body.code())
+                .code(teamCode)
                 .name(body.name())
                 .department(department)
                 .description(body.description())
@@ -76,13 +76,13 @@ public class TeamService {
 
         if (body.departmentCode() != null && !body.departmentCode().isBlank()) {
             Department department = departmentRepository.findByCode(body.departmentCode())
-                    .orElseThrow(() -> new ApiException("NOT_FOUND", "Department not found with code: " + body.departmentCode(), HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new ApiException("DEPARTMENT_NOT_FOUND", "Department not found with code: " + body.departmentCode(), HttpStatus.UNPROCESSABLE_CONTENT));
             team.setDepartment(department);
         }
 
         if (body.leadCode() != null && !body.leadCode().isBlank()) {
             Employee lead = employeeRepository.findByEmployeeCode(body.leadCode())
-                    .orElseThrow(() -> new ApiException("NOT_FOUND", "Lead employee not found with code: " + body.leadCode(), HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new ApiException("LEAD_NOT_FOUND", "Lead employee not found with code: " + body.leadCode(), HttpStatus.UNPROCESSABLE_CONTENT));
             team.setLead(lead);
         }
 

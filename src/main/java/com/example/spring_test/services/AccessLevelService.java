@@ -6,6 +6,7 @@ import com.example.spring_test.middlewares.response.GlobalResponseHandler;
 import com.example.spring_test.models.Access_level;
 import com.example.spring_test.repositories.AccessLevelRepository;
 import com.example.spring_test.utils.DTO.AccessLevelDTO;
+import com.example.spring_test.utils.helpers.GlobalHelpers;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,12 +23,13 @@ public class AccessLevelService {
 
     @Transactional
     public ResponseEntity<ApiResponse<Object>> createAccessLevel(AccessLevelDTO.CreateAccessLevelRequest body) {
-        if (accessLevelRepository.findByAccessLevelCode(body.accessLevelCode()) != null) {
-            throw new ApiException("ALREADY_EXISTS", "Access level already exists with code: " + body.accessLevelCode(), HttpStatus.CONFLICT);
+        String accessLevelCode = "ACC_" + GlobalHelpers.generateCode(body.accessLevel(), 4);
+        while (accessLevelRepository.findByAccessLevelCode(accessLevelCode) != null) {
+            accessLevelCode = "ACC_" + GlobalHelpers.generateCode(body.accessLevel(), 4);
         }
 
         Access_level accessLevel = Access_level.builder()
-                .accessLevelCode(body.accessLevelCode())
+                .accessLevelCode(accessLevelCode)
                 .accessLevel(body.accessLevel())
                 .description(body.description())
                 .active(body.active() != null ? body.active() : true)
